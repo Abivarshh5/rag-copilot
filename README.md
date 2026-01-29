@@ -62,18 +62,22 @@ make test
    npm run dev
    ```
 
-## Deployment
+## Live Deployment
 
-### Backend (Hugging Face Spaces)
-1. Create a new Space (Docker).
-2. Add `HUGGINGFACE_API_KEY` to Space secrets.
-3. Push the `backend/` folder contents to the Space.
+### 🟢 Backend (Hugging Face Spaces)
+- **Live URL**: [https://abiramavarshini-rag-backend.hf.space](https://abiramavarshini-rag-backend.hf.space)
+- **Status**: Running 🚀
 
-### Frontend (Vercel/Netlify)
-1. Connect your repo.
-2. Set Build Command: `npm run build`.
-3. Set Output Directory: `dist`.
-4. Add Environment Variable: `VITE_API_URL` pointing to your Backend URL.
+### 🔵 Frontend (Vercel/Netlify)
+To get your frontend live and accessible to everyone:
+1.  Go to [Vercel](https://vercel.com) or [Netlify](https://netlify.com).
+2.  Import your GitHub repo: `Abivarshh5/rag-copilot`.
+3.  Set the **Root Directory** to `frontend`.
+4.  Add an **Environment Variable**: 
+    - `VITE_API_URL` = `https://abiramavarshini-rag-backend.hf.space`
+5.  Click **Deploy**.
+
+Once deployed, Vercel/Netlify will give you a public URL (e.g., `rag-copilot.vercel.app`) that anyone can use!
 
 ## API Documentation
 
