@@ -12,19 +12,27 @@ DOCS_DIR = "data/docs" # Standard JSON docs
 DB_PATH = "data/chroma_db"
 COLLECTION_NAME = "docs_collection"
 
-# Initialize model
-# We initialize it at module level so it loads once when the app starts
-print("Loading Embedding Model...")
-model = SentenceTransformer('all-MiniLM-L6-v2')
-print("Model Loaded")
+# Lazy initialization
+_model = None
+_collection = None
 
-# Initialize Chroma
-client = chromadb.PersistentClient(path=DB_PATH)
-# Use cosine similarity for better score mapping (similarity = 1 - distance)
-collection = client.get_or_create_collection(
-    name=COLLECTION_NAME, 
-    metadata={"hnsw:space": "cosine"}
-)
+def get_model():
+    global _model
+    if _model is None:
+        print("Loading Embedding Model...")
+        _model = SentenceTransformer('all-MiniLM-L6-v2')
+        print("Model Loaded")
+    return _model
+
+def get_collection():
+    global _collection
+    if _collection is None:
+        client = chromadb.PersistentClient(path=DB_PATH)
+        _collection = client.get_or_create_collection(
+            name=COLLECTION_NAME, 
+            metadata={"hnsw:space": "cosine"}
+        )
+    return _collection
 
 # BM25 Global State
 bm25 = None
@@ -35,7 +43,8 @@ def init_bm25():
     """Initializes BM25 from existing ChromaDB data."""
     global bm25, bm25_chunks, bm25_metadatas
     try:
-        results = collection.get()
+        col = get_collection()
+        results = col.get()
         if results and results['documents']:
             bm25_chunks = results['documents']
             bm25_metadatas = results['metadatas']
@@ -125,10 +134,12 @@ def ingest_docs():
 
     if all_chunks:
         # Generate embeddings with normalization for better cosine similarity
-        embeddings = model.encode(all_chunks, normalize_embeddings=True).tolist()
+        m = get_model()
+        embeddings = m.encode(all_chunks, normalize_embeddings=True).tolist()
         
         # Add to Chroma (upsert overwrites if ID exists)
-        collection.upsert(
+        col = get_collection()
+        col.upsert(
             documents=all_chunks,
             embeddings=embeddings,
             metadatas=all_metadatas,
@@ -141,10 +152,12 @@ def ingest_docs():
 
 def retrieve_docs(query: str, k: int = 3):
     # Embed query with normalization
-    query_embedding = model.encode([query], normalize_embeddings=True).tolist()
+    m = get_model()
+    query_embedding = m.encode([query], normalize_embeddings=True).tolist()
     
     # Search
-    results = collection.query(
+    col = get_collection()
+    results = col.query(
         query_embeddings=query_embedding,
         n_results=k
     )
