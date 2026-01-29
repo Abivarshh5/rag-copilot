@@ -37,7 +37,11 @@ async def log_requests(request: Request, call_next):
 
 @app.on_event("startup")
 def startup_event():
-    init_db()
+    try:
+        init_db()
+        logger.info("Database initialized successfully.")
+    except Exception as e:
+        logger.error(f"Failed to initialize database: {e}")
 
 @app.get("/")
 def read_root():

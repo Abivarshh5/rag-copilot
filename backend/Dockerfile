@@ -3,7 +3,10 @@ FROM python:3.10
 # Create a non-root user
 RUN useradd -m -u 1000 user
 USER user
-ENV PATH="/home/user/.local/bin:$PATH"
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH \
+    HF_HOME=/home/user/.cache/huggingface \
+    TRANSFORMERS_CACHE=/home/user/.cache/huggingface/hub
 
 # Set working directory to user home
 WORKDIR /home/user/app
