@@ -1,9 +1,11 @@
+import os
 import time
 import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.init_db import init_db
 from app.api import auth, rag
+from app.rag.engine import init_bm25, DATA_DIR, DOCS_DIR, DB_PATH
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -38,10 +40,21 @@ async def log_requests(request: Request, call_next):
 @app.on_event("startup")
 def startup_event():
     try:
+        # 1. Ensure directories exist for HF write access
+        for path in [DATA_DIR, DOCS_DIR, DB_PATH]:
+            if not os.path.exists(path):
+                os.makedirs(path, exist_ok=True)
+                logger.info(f"Created directory: {path}")
+
+        # 2. Initialize DB
         init_db()
         logger.info("Database initialized successfully.")
+
+        # 3. Initialize BM25
+        init_bm25()
+        logger.info("BM25 initialized successfully.")
     except Exception as e:
-        logger.error(f"Failed to initialize database: {e}")
+        logger.error(f"Failed during startup: {e}")
 
 @app.get("/")
 def read_root():

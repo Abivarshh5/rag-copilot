@@ -7,9 +7,10 @@ from rank_bm25 import BM25Okapi
 from pypdf import PdfReader
 
 # Setup
-DATA_DIR = "data"
-DOCS_DIR = "data/docs" # Standard JSON docs
-DB_PATH = "data/chroma_db"
+# Use home directory for write permissions on HF Spaces
+DATA_DIR = "/home/user/app/data"
+DOCS_DIR = "/home/user/app/data/docs"
+DB_PATH = "/home/user/app/data/chroma_db"
 COLLECTION_NAME = "docs_collection"
 
 # Lazy initialization
@@ -54,8 +55,8 @@ def init_bm25():
     except Exception as e:
         print(f"BM25 Init Error: {e}")
 
-# Call init on startup
-init_bm25()
+# Call init on startup? No, move to FastAPI startup_event to avoid import-time crashes.
+# init_bm25()
 
 def load_docs() -> List[Dict]:
     """Loads both JSON and PDF documents from their respective directories."""
