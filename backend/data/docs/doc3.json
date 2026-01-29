@@ -1,0 +1,5 @@
+{
+    "id": 3,
+    "title": "Vector Databases Explanation",
+    "body": "A vector database is a type of database that indexes and stores vector embeddings for fast retrieval and similarity search. Capabilities includes: storing embeddings, finding similar items (nearest neighbor search), and scaling to billions of vectors. Traditional databases index text for keyword search, but vector databases index the semantic meaning of text represented as high-dimensional vectors. This allows for semantic search, recommendation systems, and RAG architectures."
+}

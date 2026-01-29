@@ -1,0 +1,92 @@
+[
+  {
+    "query": "What is FastAPI?",
+    "type": "answerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "Mention two key features of FastAPI.",
+    "type": "answerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "Is FastAPI compatible with OpenAPI?",
+    "type": "answerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "What are Newton's laws of motion?",
+    "type": "answerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "Define Newton's first law.",
+    "type": "answerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "What is the equation for Newton's second law?",
+    "type": "answerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "What does the third law of motion state?",
+    "type": "answerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "What is a vector database?",
+    "type": "answerable",
+    "status": "success",
+    "answer": "A vector database is a type of database that indexes and stores vector embeddings for fast retrieval..."
+  },
+  {
+    "query": "Mention one capability of a vector database besides storing embeddings.",
+    "type": "answerable",
+    "status": "success",
+    "answer": "One capability of a vector database besides storing embeddings is finding similar items (nearest nei..."
+  },
+  {
+    "query": "How do vector databases differ from traditional ones regarding indexing?",
+    "type": "answerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "Who is the president of Mars?",
+    "type": "unanswerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "What is the recipe for chocolate cake?",
+    "type": "unanswerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "How many people live in Tokyo?",
+    "type": "unanswerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "What is the stock price of Apple today?",
+    "type": "unanswerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  },
+  {
+    "query": "Who won the World Cup in 1998?",
+    "type": "unanswerable",
+    "status": "low_context",
+    "answer": "I don't have enough information to answer this."
+  }
+]

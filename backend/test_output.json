@@ -1,0 +1,44 @@
+[
+  {
+    "test": "GET /health",
+    "status": "PASS",
+    "code": 200,
+    "body": "{\"status\":\"ok\"}"
+  },
+  {
+    "test": "POST /auth/signup",
+    "status": "PASS",
+    "code": 400,
+    "body": "{\"detail\":\"Email already exists\"}"
+  },
+  {
+    "test": "POST /auth/login",
+    "status": "PASS",
+    "code": 200,
+    "body": "{\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3Njk2NjExOTN9.kod97"
+  },
+  {
+    "test": "GET /auth/me (no token)",
+    "status": "PASS",
+    "code": 401,
+    "body": "{\"detail\":\"Not authenticated\"}"
+  },
+  {
+    "test": "GET /auth/me (valid token)",
+    "status": "PASS",
+    "code": 200,
+    "body": "{\"id\":3,\"email\":\"finaltest@example.com\"}"
+  },
+  {
+    "test": "GET /auth/me (invalid token)",
+    "status": "PASS",
+    "code": 401,
+    "body": "{\"detail\":\"Invalid or expired token\"}"
+  },
+  {
+    "test": "OPTIONS /health (CORS)",
+    "status": "PASS",
+    "code": 200,
+    "body": "{'access-control-allow-methods': 'DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT', 'access-control-max-age': '600', 'access-control-allow-credentials': 'true', 'access-control-allow-origin': 'http://localhost:3000'}"
+  }
+]

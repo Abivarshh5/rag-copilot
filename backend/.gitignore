@@ -1,0 +1,12 @@
+# databases
+*.db
+*.sqlite3
+
+# chroma
+data/chroma_db/
+
+# documents
+*.pdf
+
+# env
+.env

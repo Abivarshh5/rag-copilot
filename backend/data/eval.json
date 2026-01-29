@@ -1,0 +1,82 @@
+[
+    {
+        "question": "What is FastAPI?",
+        "expected": "FastAPI is a modern, fast web framework for building APIs with Python."
+    },
+    {
+        "question": "Mention two key features of FastAPI.",
+        "expected": "High performance (Starlette/Pydantic) and fast to code."
+    },
+    {
+        "question": "Is FastAPI compatible with OpenAPI?",
+        "expected": "Yes, it is based on and fully compatible with OpenAPI."
+    },
+    {
+        "question": "What are Newton's laws of motion?",
+        "expected": "First (Inertia), Second (Force), Third (Action/Reaction)."
+    },
+    {
+        "question": "Define Newton's first law.",
+        "expected": "An object at rest stays at rest unless acted upon by a force."
+    },
+    {
+        "question": "What is the equation for Newton's second law?",
+        "expected": "F = ma."
+    },
+    {
+        "question": "What does the third law of motion state?",
+        "expected": "For every action, there is an equal and opposite reaction."
+    },
+    {
+        "question": "What is a vector database?",
+        "expected": "A database that indexes and stores vector embeddings for fast retrieval."
+    },
+    {
+        "question": "Mention one capability of a vector database besides storing embeddings.",
+        "expected": "Finding similar items (nearest neighbor search)."
+    },
+    {
+        "question": "How do vector databases differ from traditional ones regarding indexing?",
+        "expected": "They use vector embeddings instead of simple values."
+    },
+    {
+        "question": "Who is the president of Mars?",
+        "expected": "low_context"
+    },
+    {
+        "question": "What is the recipe for chocolate cake?",
+        "expected": "low_context"
+    },
+    {
+        "question": "How many people live in Tokyo?",
+        "expected": "low_context"
+    },
+    {
+        "question": "What is the stock price of Apple today?",
+        "expected": "low_context"
+    },
+    {
+        "question": "Who won the World Cup in 1998?",
+        "expected": "low_context"
+    },
+    {
+        "question": "What is the chemical symbol for Gold?",
+        "expected": "low_context"
+    },
+    {
+        "question": "How far is the moon from earth?",
+        "expected": "low_context"
+    },
+    {
+        "question": "Who wrote Romeo and Juliet?",
+        "expected": "low_context"
+    },
+    {
+        "question": "What is 2+2?",
+        "expected": "low_context"
+    },
+    {
+        "question": "Who is the primary maintainer of Linux?",
+        "expected": "low_context"
+    }
+]
