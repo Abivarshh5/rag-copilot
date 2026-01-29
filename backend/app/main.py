@@ -14,8 +14,12 @@ app = FastAPI()
 # CORS Middleware - permit all origins for now to resolve Vercel deployment issues
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False, # Must be False if using ["*"]
+    allow_origins=[
+        "*",
+        "https://rag-copilot.vercel.app",
+        "http://localhost:5173"
+    ],
+    allow_credentials=False, # Must be False if using ["*"] or combined with wildcard
     allow_methods=["*"],
     allow_headers=["*"],
 )
