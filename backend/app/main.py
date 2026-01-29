@@ -11,11 +11,11 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# CORS Middleware - allow all origins for development
+# CORS Middleware - permit all origins for now to resolve Vercel deployment issues
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your frontend origin
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False, # Must be False if using ["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )

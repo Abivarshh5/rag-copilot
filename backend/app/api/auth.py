@@ -70,6 +70,7 @@ def get_current_user(
 # 6. signup endpoint
 @router.post("/signup")
 def signup(data: SignupRequest, db: Session = Depends(get_db)):
+    print(f"DEBUG: Signup attempt for email: {data.email}")
     if email_exists(db, data.email):
         raise HTTPException(status_code=400, detail="Email already exists")
 
@@ -87,6 +88,7 @@ def signup(data: SignupRequest, db: Session = Depends(get_db)):
 # 7. login endpoint
 @router.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
+    print(f"DEBUG: Login attempt for email: {data.email}")
     user = get_user_by_email(db, data.email)
 
     if not user:

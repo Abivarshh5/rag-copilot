@@ -6,3 +6,5 @@ venv
 .gitignore
 data/chroma_db
 *.log
+*.db
+*.sqlite3
