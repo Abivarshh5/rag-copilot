@@ -68,16 +68,11 @@ make test
 - **Live URL**: [https://abiramavarshini-rag-backend.hf.space](https://abiramavarshini-rag-backend.hf.space)
 - **Status**: Running 🚀
 
-### 🔵 Frontend (Vercel/Netlify)
-To get your frontend live and accessible to everyone:
-1.  Go to [Vercel](https://vercel.com) or [Netlify](https://netlify.com).
-2.  Import your GitHub repo: `Abivarshh5/rag-copilot`.
-3.  Set the **Root Directory** to `frontend`.
-4.  Add an **Environment Variable**: 
-    - `VITE_API_URL` = `https://abiramavarshini-rag-backend.hf.space`
-5.  Click **Deploy**.
+### 🔵 Frontend (Vercel)
+- **Live URL**: [https://rag-copilot.vercel.app/](https://rag-copilot.vercel.app/)
+- **Status**: Running 🚀
 
-Once deployed, Vercel/Netlify will give you a public URL (e.g., `rag-copilot.vercel.app`) that anyone can use!
+Anyone with this link can sign up, log in, and use the RAG copilot without any local setup.
 
 ## API Documentation
 
