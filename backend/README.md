@@ -1,11 +1,10 @@
 ---
-title: Rag Backend
-emoji: 🚀
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-python_version: 3.10
-app_file: app/main.py
+title: "Rag Backend"
+emoji: "🚀"
+colorFrom: "blue"
+colorTo: "indigo"
+sdk: "docker"
+app_port: 7860
 pinned: false
 ---
 
