@@ -4,7 +4,9 @@ emoji: 🚀
 colorFrom: blue
 colorTo: indigo
 sdk: docker
-app_port: 7860
+python_version: 3.10
+app_file: app/main.py
+pinned: false
 ---
 
 # RAG Backend
