@@ -30,7 +30,7 @@ graph TD
         Chunks -->|Embed| Chroma[(ChromaDB)]
         Chunks -->|Tokenize| BM25[BM25 Index]
         Chroma & BM25 -->|Retrieve| Hyb[Hybrid Search]
-        Hyb -->|Context| LLM[LLM (Llama/OpenAI)]
+        Hyb -->|Context| LLM["LLM (Llama/OpenAI)"]
     end
 ```
 
