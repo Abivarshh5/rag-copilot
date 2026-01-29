@@ -2,7 +2,8 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
+# Use home directory for write permissions on HF Spaces
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:////home/user/app.db")
 
 engine = create_engine(
     DATABASE_URL, connect_args={"check_same_thread": False}
