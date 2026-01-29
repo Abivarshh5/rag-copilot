@@ -35,6 +35,14 @@ async def log_requests(request: Request, call_next):
 def startup_event():
     init_db()
 
+@app.get("/")
+def read_root():
+    return {
+        "message": "RAG Copilot Backend is running!",
+        "docs": "/docs",
+        "health": "/health"
+    }
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
