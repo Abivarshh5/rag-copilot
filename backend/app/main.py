@@ -72,12 +72,34 @@ def health():
 def debug_db():
     try:
         from sqlalchemy import text
-        from app.db.database import engine
+        from sqlalchemy.orm import Session
+        from app.db.database import engine, SessionLocal
+        from app.db.models import User
+        
+        # 1. Test raw connection
         with engine.connect() as connection:
-            result = connection.execute(text("SELECT 1"))
-            return {"status": "success", "message": "Database connection successful"}
+            connection.execute(text("SELECT 1"))
+        
+        # 2. Test ORM
+        db = SessionLocal()
+        try:
+            user_count = db.query(User).count()
+            return {
+                "status": "success", 
+                "message": "Database and ORM connected", 
+                "user_count": user_count
+            }
+        finally:
+            db.close()
+            
     except Exception as e:
-        return {"status": "error", "message": str(e), "type": str(type(e))}
+        import traceback
+        return {
+            "status": "error", 
+            "message": str(e), 
+            "type": str(type(e)),
+            "traceback": traceback.format_exc()
+        }
 
 app.include_router(auth.router)
 app.include_router(rag.router)
