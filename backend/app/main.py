@@ -68,5 +68,16 @@ def read_root():
 def health():
     return {"status": "ok"}
 
+@app.get("/debug_db")
+def debug_db():
+    try:
+        from sqlalchemy import text
+        from app.db.database import engine
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            return {"status": "success", "message": "Database connection successful"}
+    except Exception as e:
+        return {"status": "error", "message": str(e), "type": str(type(e))}
+
 app.include_router(auth.router)
 app.include_router(rag.router)
