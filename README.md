@@ -1,3 +1,13 @@
+---
+title: Rag Backend
+emoji: 🚀
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # RAG Copilot with Authentication
 
 A full-stack AI Copilot application featuring Retrieval-Augmented Generation (RAG) for PDF knowledge bases, complete with user authentication, precision scoring, and a modern React frontend.
