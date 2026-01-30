@@ -6,11 +6,21 @@ from sentence_transformers import SentenceTransformer
 from rank_bm25 import BM25Okapi
 from pypdf import PdfReader
 
-# Setup
-# Use home directory for write permissions on HF Spaces
-DATA_DIR = "/home/user/app/data"
-DOCS_DIR = "/home/user/app/data/docs"
-DB_PATH = "/home/user/app/data/chroma_db"
+# Setup - Detect if running on Hugging Face Spaces
+IS_HF_SPACE = os.getenv("SPACE_ID") is not None
+
+# Use /home/user/data for HF Spaces persistent storage (recommended by HF)
+if IS_HF_SPACE:
+    DATA_DIR = "/home/user/data"
+    DOCS_DIR = "/home/user/data/docs"
+    DB_PATH = "/home/user/data/chroma_db"
+else:
+    # Local development - use paths relative to project
+    _BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    DATA_DIR = os.path.join(_BASE_DIR, "data")
+    DOCS_DIR = os.path.join(_BASE_DIR, "data", "docs")
+    DB_PATH = os.path.join(_BASE_DIR, "data", "chroma_db")
+
 COLLECTION_NAME = "docs_collection"
 
 # Lazy initialization
