@@ -1,4 +1,9 @@
 from passlib.context import CryptContext
+# Fix for passlib + bcrypt 4.0.0+ incompatibility
+# Ref: https://github.com/pyca/bcrypt/issues/684
+from passlib.handlers.bcrypt import bcrypt as _bcrypt
+_bcrypt.set_backend("os_crypt")
+
 from datetime import datetime, timedelta
 from jose import jwt
 
