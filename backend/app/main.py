@@ -83,12 +83,23 @@ def debug_db():
         # 2. Test ORM
         db = SessionLocal()
         try:
-            user_count = db.query(User).count()
-            return {
-                "status": "success", 
-                "message": "Database and ORM connected", 
-                "user_count": user_count
-            }
+            # Simulation of login query
+            test_email = "test_manual@example.com"
+            user = db.query(User).filter(User.email == test_email).first()
+            
+            if user:
+                return {
+                    "status": "success", 
+                    "message": "Login query simulation successful", 
+                    "user_id": user.id,
+                    "email": user.email
+                }
+            else:
+                return {
+                    "status": "warning", 
+                    "message": "Login query worked but user not found",
+                    "searched_for": test_email
+                }
         finally:
             db.close()
             
