@@ -1,9 +1,4 @@
-from passlib.context import CryptContext
-# Fix for passlib + bcrypt 4.0.0+ incompatibility
-# Ref: https://github.com/pyca/bcrypt/issues/684
-from passlib.handlers.bcrypt import bcrypt as _bcrypt
-_bcrypt.set_backend("os_crypt")
-
+import bcrypt
 from datetime import datetime, timedelta
 from jose import jwt
 
@@ -11,16 +6,21 @@ SECRET_KEY = "super-secret-key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
-
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    """Hash a password using raw bcrypt library."""
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed.decode('utf-8')
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    """Verify a password using raw bcrypt library."""
+    try:
+        return bcrypt.checkpw(
+            plain_password.encode('utf-8'), 
+            hashed_password.encode('utf-8')
+        )
+    except Exception:
+        return False
 
 def create_access_token(data: dict):
     to_encode = data.copy()
