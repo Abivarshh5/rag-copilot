@@ -11,6 +11,14 @@ from app.rag.engine import init_bm25, DATA_DIR, DOCS_DIR, DB_PATH
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Monkeypatch passlib to fix bcrypt 4.0.0+ incompatibility
+# Ref: https://github.com/pyca/bcrypt/issues/684
+try:
+    from passlib.handlers.bcrypt import bcrypt
+    bcrypt.set_backend("os_crypt")
+except Exception as e:
+    logger.warning(f"Failed to monkeypatch passlib: {e}")
+
 app = FastAPI()
 
 # CORS Middleware - permit all origins for now to resolve Vercel deployment issues
