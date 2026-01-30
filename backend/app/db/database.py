@@ -16,7 +16,20 @@ DATABASE_URL = os.getenv(
 
 logger.info(f"Connecting to database...")
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(
+    DATABASE_URL, 
+    pool_pre_ping=True,
+    # Supabase Transaction Mode Pooler requirements:
+    # 1. Disable prepared statements (prepare_threshold=None)
+    # 2. Add keepalives to prevent timeouts
+    connect_args={
+        "prepare_threshold": None,
+        "keepalives": 1, 
+        "keepalives_idle": 30,
+        "keepalives_interval": 10, 
+        "keepalives_count": 5
+    }
+)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
