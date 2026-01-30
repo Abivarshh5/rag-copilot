@@ -75,31 +75,40 @@ def debug_db():
         from sqlalchemy.orm import Session
         from app.db.database import engine, SessionLocal
         from app.db.models import User
+        from app.core.security import hash_password, verify_password, create_access_token
         
+        results = {}
+
         # 1. Test raw connection
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
+        results["raw_db"] = "ok"
         
         # 2. Test ORM
         db = SessionLocal()
         try:
-            # Simulation of login query
             test_email = "test_manual@example.com"
             user = db.query(User).filter(User.email == test_email).first()
+            results["orm_query"] = "ok"
+            results["user_found"] = user is not None
             
+            # 3. Test Security Utils (passlib/bcrypt)
             if user:
-                return {
-                    "status": "success", 
-                    "message": "Login query simulation successful", 
-                    "user_id": user.id,
-                    "email": user.email
-                }
+                pw_ok = verify_password("password123", user.password_hash)
+                results["password_verify"] = "ok" if pw_ok else "fail_match"
             else:
-                return {
-                    "status": "warning", 
-                    "message": "Login query worked but user not found",
-                    "searched_for": test_email
-                }
+                hashed = hash_password("test")
+                results["password_hash"] = "ok"
+            
+            # 4. Test JWT (jose)
+            token = create_access_token({"user_id": 1})
+            results["jwt_encode"] = "ok"
+
+            return {
+                "status": "success", 
+                "message": "Full system check complete", 
+                "checks": results
+            }
         finally:
             db.close()
             
