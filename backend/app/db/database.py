@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 SUPABASE_PASSWORD = quote_plus("Varshini@512")
 DATABASE_URL = os.getenv(
     "DATABASE_URL", 
-    f"postgresql+psycopg2://postgres:{SUPABASE_PASSWORD}@db.tljppxeshzeyjrupxpcc.supabase.co:5432/postgres"
+    f"postgresql+psycopg2://postgres.tljppxeshzeyjrupxpcc:{SUPABASE_PASSWORD}@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres"
 )
 
 logger.info(f"Connecting to database...")
