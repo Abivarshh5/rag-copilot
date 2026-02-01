@@ -123,16 +123,7 @@ def generate_answer(query: str):
         status = "low_context"
         explanation = f"Only found {len(relevant_chunks)} chunks above {REVISED_THRESHOLD} threshold (needed {REVISED_MIN_CHUNKS}). Top score: {top_score:.4f}"
         print(f"DEBUG: Guardrails triggered. {explanation}")
-        
-    if status == "low_context":
-        metrics.log_request("low_context", time.time() - start_time, top_score)
-        return {
-            "answer": "I don't have enough information to answer this.",
-            "status": "low_context",
-            "trace_id": trace_id,
-            "explanation": explanation if len(chunks) > 0 else "No relevant documents found.",
-            "sources": chunks
-        }
+        # Note: We continue to allow fallback generation
 
     # 3. GENERATE
     try:

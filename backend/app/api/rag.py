@@ -41,9 +41,16 @@ def debug_count():
 @router.get("/debug_path")
 def debug_path():
     import os
-    return {
+    from app.rag.engine import DATA_DIR, DOCS_DIR
+    res = {
         "cwd": os.getcwd(),
+        "DATA_DIR": DATA_DIR,
+        "DOCS_DIR": DOCS_DIR,
         "ls_root": os.listdir("."),
-        "exists_data": os.path.exists("data"),
-        "exists_backend_data": os.path.exists("backend/data")
+        "exists_data": os.path.exists("data")
     }
+    if res["exists_data"]:
+        res["ls_data"] = os.listdir("data")
+    if os.path.exists(DOCS_DIR):
+        res["ls_docs"] = os.listdir(DOCS_DIR)
+    return res
