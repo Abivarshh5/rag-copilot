@@ -9,19 +9,19 @@ from pypdf import PdfReader
 # Setup - Detect if running on Hugging Face Spaces
 IS_HF_SPACE = os.getenv("SPACE_ID") is not None
 
-# Unified path logic aligned with database.py (Ephemeral storage for HF)
+# Robust path logic using the file location itself
+_APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_BASE_DIR = os.path.dirname(_APP_DIR)
+DATA_DIR = os.path.join(_BASE_DIR, "data")
+DOCS_DIR = os.path.join(DATA_DIR, "docs")
+DB_PATH = os.path.join(DATA_DIR, "chroma_db")
+
 if IS_HF_SPACE:
-    _BASE_DIR = os.getcwd()
-    DATA_DIR = os.path.join(_BASE_DIR, "data") # This is where the deployed PDFs live
-    DOCS_DIR = os.path.join(DATA_DIR, "docs")
-    DB_PATH = os.path.join(DATA_DIR, "chroma_db")
     print(f"HF RAG PATHS: DATA={DATA_DIR}, DB={DB_PATH}")
-else:
-    # Local development
-    _BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    DATA_DIR = os.path.join(_BASE_DIR, "data")
-    DOCS_DIR = os.path.join(DATA_DIR, "docs")
-    DB_PATH = os.path.join(DATA_DIR, "chroma_db")
+    # Ensure directories exist
+    os.makedirs(DATA_DIR, exist_ok=True)
+    os.makedirs(DOCS_DIR, exist_ok=True)
+    os.makedirs(DB_PATH, exist_ok=True)
 
 COLLECTION_NAME = "docs_collection"
 

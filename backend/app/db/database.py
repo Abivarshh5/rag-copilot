@@ -12,23 +12,17 @@ logger = logging.getLogger(__name__)
 # Check if running on Hugging Face Spaces
 IS_HF_SPACE = os.getenv("SPACE_ID") is not None
 
-# Check if running on Hugging Face Spaces
-IS_HF_SPACE = os.getenv("SPACE_ID") is not None
+_APP_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_BASE_DIR = os.path.dirname(_APP_DIR)
 
 if IS_HF_SPACE:
-    # User does NOT have persistent storage enabled (/data).
-    # We must use a local writable directory inside the container.
-    # standard HF working dir is /home/user/app.
-    # We can write to a subdirectory like /home/user/app/data or just ./data
-    # BUT we need to make sure we copy the seeded db there.
-    
-    # Force use of local directory
-    DB_DIR = os.path.join(os.getcwd(), "data")
+    # Use data directory in the root
+    DB_DIR = os.path.join(_BASE_DIR, "data")
     os.makedirs(DB_DIR, exist_ok=True)
     
     DB_FILE = os.path.join(DB_DIR, "app.db")
     DATABASE_URL = f"sqlite:///{DB_FILE}"
-    logger.info(f"Using Ephemeral DB Path: {DATABASE_URL}")
+    logger.info(f"Using Standardized HF DB Path: {DATABASE_URL}")
 else:
     # Local development
     DATABASE_URL = "sqlite:///./app.db"
