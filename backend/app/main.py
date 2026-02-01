@@ -41,30 +41,40 @@ async def log_requests(request: Request, call_next):
 
 @app.on_event("startup")
 def startup_event():
-    try:
-        # 1. Ensure directories exist for HF write access
-        for path in [DATA_DIR, DOCS_DIR, DB_PATH]:
-            if not os.path.exists(path):
-                os.makedirs(path, exist_ok=True)
-                logger.info(f"Created directory: {path}")
+    import threading
+    
+    def run_startup():
+        try:
+            # 1. Ensure directories exist
+            for path in [DATA_DIR, DOCS_DIR, DB_PATH]:
+                if not os.path.exists(path):
+                    os.makedirs(path, exist_ok=True)
+                    logger.info(f"Created directory: {path}")
 
-        # 2. Initialize DB
-        init_db()
-        logger.info("Database initialized successfully.")
+            # 2. Initialize DB
+            init_db()
+            logger.info("Database initialized successfully.")
 
-        # 3. Check if ingestion is needed (self-healing)
-        from app.rag.engine import get_collection, ingest_docs
-        col = get_collection()
-        if col.count() == 0:
-            logger.info("Vector DB is empty. Starting auto-ingestion...")
-            stats = ingest_docs()
-            logger.info(f"Auto-ingestion complete: {stats}")
+            # 3. Check if ingestion is needed (self-healing)
+            from app.rag.engine import get_collection, ingest_docs, init_bm25
+            col = get_collection()
+            
+            # Initialize BM25 with existing data immediately
+            init_bm25()
+            
+            if col.count() == 0:
+                logger.info("Vector DB is empty. Starting background auto-ingestion...")
+                stats = ingest_docs()
+                logger.info(f"Background auto-ingestion complete: {stats}")
+            else:
+                logger.info(f"Vector DB already has {col.count()} chunks.")
+                
+        except Exception as e:
+            logger.error(f"Failed during background startup: {e}")
 
-        # 4. Initialize BM25
-        init_bm25()
-        logger.info("BM25 initialized successfully.")
-    except Exception as e:
-        logger.error(f"Failed during startup: {e}")
+    # Kick off the startup logic in a thread so API becomes ready immediately
+    threading.Thread(target=run_startup, daemon=True).start()
+    logger.info("Startup sequence initiated in background thread.")
 
 # --- API ROUTES (Define these FIRST) ---
 app.include_router(auth.router)

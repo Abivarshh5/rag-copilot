@@ -89,7 +89,7 @@ def load_docs() -> List[Dict]:
     # 2. Load PDFs from data/
     if os.path.exists(DATA_DIR):
         for filename in os.listdir(DATA_DIR):
-            if filename.endswith(".pdf"):
+            if filename.lower().endswith(".pdf"):
                 path = os.path.join(DATA_DIR, filename)
                 try:
                     reader = PdfReader(path)
