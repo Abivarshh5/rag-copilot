@@ -31,3 +31,9 @@ def ask_endpoint(request: AskRequest):
 def get_metrics():
     from app.core.metrics import metrics
     return metrics.get_metrics()
+
+@router.get("/debug_count")
+def debug_count():
+    from app.rag.engine import get_collection
+    col = get_collection()
+    return {"count": col.count()}
