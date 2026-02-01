@@ -52,7 +52,15 @@ def startup_event():
         init_db()
         logger.info("Database initialized successfully.")
 
-        # 3. Initialize BM25
+        # 3. Check if ingestion is needed (self-healing)
+        from app.rag.engine import get_collection, ingest_docs
+        col = get_collection()
+        if col.count() == 0:
+            logger.info("Vector DB is empty. Starting auto-ingestion...")
+            stats = ingest_docs()
+            logger.info(f"Auto-ingestion complete: {stats}")
+
+        # 4. Initialize BM25
         init_bm25()
         logger.info("BM25 initialized successfully.")
     except Exception as e:

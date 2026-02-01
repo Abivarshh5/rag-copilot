@@ -96,11 +96,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="User not found")
 
     if not verify_password(data.password, user.password_hash):
-        # DEBUG: distinct error with RECEIVED payload info
-        # WARNING: Insecure, remove after fix
-        msg = f"Incorrect password. Server received: {data.password!r} (Length: {len(data.password)})"
-        print(msg)
-        raise HTTPException(status_code=400, detail=msg)
+        raise HTTPException(status_code=400, detail="Invalid credentials")
 
     # Optimization: Re-hash if using old slow rounds
     from app.core.security import needs_rehash, hash_password

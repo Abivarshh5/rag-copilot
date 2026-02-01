@@ -9,17 +9,19 @@ from pypdf import PdfReader
 # Setup - Detect if running on Hugging Face Spaces
 IS_HF_SPACE = os.getenv("SPACE_ID") is not None
 
-# Use /home/user/data for HF Spaces persistent storage (recommended by HF)
+# Unified path logic aligned with database.py (Ephemeral storage for HF)
 if IS_HF_SPACE:
-    DATA_DIR = "/home/user/data"
-    DOCS_DIR = "/home/user/data/docs"
-    DB_PATH = "/home/user/data/chroma_db"
+    _BASE_DIR = os.getcwd()
+    DATA_DIR = os.path.join(_BASE_DIR, "data") # This is where the deployed PDFs live
+    DOCS_DIR = os.path.join(DATA_DIR, "docs")
+    DB_PATH = os.path.join(DATA_DIR, "chroma_db")
+    print(f"HF RAG PATHS: DATA={DATA_DIR}, DB={DB_PATH}")
 else:
-    # Local development - use paths relative to project
+    # Local development
     _BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     DATA_DIR = os.path.join(_BASE_DIR, "data")
-    DOCS_DIR = os.path.join(_BASE_DIR, "data", "docs")
-    DB_PATH = os.path.join(_BASE_DIR, "data", "chroma_db")
+    DOCS_DIR = os.path.join(DATA_DIR, "docs")
+    DB_PATH = os.path.join(DATA_DIR, "chroma_db")
 
 COLLECTION_NAME = "docs_collection"
 
@@ -107,7 +109,7 @@ def load_docs() -> List[Dict]:
                     
     return docs
 
-def chunk_text(text: str, chunk_size: int = 150, overlap: int = 30) -> List[str]:
+def chunk_text(text: str, chunk_size: int = 300, overlap: int = 50) -> List[str]:
     """Splits text into overlapping chunks of words. Increased size for better context."""
     words = text.split()
     chunks = []
@@ -186,41 +188,52 @@ def retrieve_docs(query: str, k: int = 3):
     return hits
 
 def hybrid_retrieve_docs(query: str, k: int = 5):
-    """Combines BM25 and Vector Search results."""
+    """Combines BM25 and Vector Search results using Reciprocal Rank Fusion (RRF)."""
     # 1. Vector Search
-    vector_hits = retrieve_docs(query, k=k)
+    vector_hits = retrieve_docs(query, k=k*2)
     
     # 2. BM25 Search
     bm25_hits = []
     if bm25:
         tokenized_query = query.split()
-        # Get top results from BM25
         scores = bm25.get_scores(tokenized_query)
-        # Sort by score and get top k
-        top_n = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:k]
-        
+        top_n = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:k*2]
         for i in top_n:
             if scores[i] > 0:
                 bm25_hits.append({
                     "text": bm25_chunks[i],
                     "metadata": bm25_metadatas[i] if i < len(bm25_metadatas) else {},
-                    "score": float(scores[i]),
-                    "type": "keyword"
+                    "score": float(scores[i])
                 })
 
-    # 3. Combine (Union and remove duplicates)
-    combined = []
-    seen = set()
+    # 3. RRF Combination
+    # RRF Score = sum(1 / (k + rank))
+    rrf_k = 60
+    scores = {} # text -> score
+    doc_map = {} # text -> full hit object
     
-    # Priority for vector hits (they have better metadata and distance)
-    for hit in vector_hits:
-        combined.append(hit)
-        seen.add(hit["text"])
+    # Vector ranks
+    for rank, hit in enumerate(vector_hits):
+        txt = hit["text"]
+        scores[txt] = scores.get(txt, 0) + 1.0 / (rrf_k + rank + 1)
+        doc_map[txt] = hit
         
-    for hit in bm25_hits:
-        if hit["text"] not in seen:
-            combined.append(hit)
-            seen.add(hit["text"])
-            
-    # Scale back to k if overloaded
-    return combined[:k]
+    # BM25 ranks
+    for rank, hit in enumerate(bm25_hits):
+        txt = hit["text"]
+        scores[txt] = scores.get(txt, 0) + 1.0 / (rrf_k + rank + 1)
+        if txt not in doc_map:
+             doc_map[txt] = hit
+             # Ensure distances/scores are normalized later
+             doc_map[txt]["distance"] = 0.5 # Default middle for keyword hits
+
+    # Sort by RRF score
+    sorted_texts = sorted(scores.keys(), key=lambda t: scores[t], reverse=True)
+    
+    results = []
+    for txt in sorted_texts[:k]:
+        hit = doc_map[txt]
+        hit["rrf_score"] = scores[txt]
+        results.append(hit)
+        
+    return results

@@ -45,11 +45,10 @@ def get_llm():
 
 llm = get_llm()
 
-# PROMPT TEMPLATE (STRICT)
-template = """You are a helpful assistant.
-Use the context below to answer the question.
-Provide a comprehensive and detailed answer based ONLY on the provided context.
-If the context mentions multiple points, list them out clearly.
+# PROMPT TEMPLATE (STRICT for Context, Helpful for General)
+template_with_context = """You are a highly accurate document assistant.
+Use the provided context to answer the question as precisely as possible.
+If the information is in the context, refer to it exactly.
 
 Context:
 {context}
@@ -57,11 +56,19 @@ Context:
 Question:
 {question}
 
-If the context does not contain enough information, respond exactly with:
-"I don't have enough information to answer this."
+Answer based ONLY on the context above. If the context does not contain the answer, say "I don't have enough information in the documents to answer this accurately."
 """
 
-prompt = PromptTemplate(template=template, input_variables=["context", "question"])
+template_no_context = """You are a helpful assistant. 
+The user asked a question that is not covered in their uploaded documents.
+Provide a concise general answer, but start your response with: "This info is not in your documents, but here is some general context: "
+
+Question:
+{question}
+"""
+
+prompt_context = PromptTemplate(template=template_with_context, input_variables=["context", "question"])
+prompt_general = PromptTemplate(template=template_no_context, input_variables=["question"])
 
 def generate_answer(query: str):
     start_time = time.time()
@@ -128,32 +135,43 @@ def generate_answer(query: str):
         }
 
     # 3. GENERATE
-    # Use top 5 chunks for more context
-    context_text = "\n\n".join([c["text"] for c in relevant_chunks[:5]])
-    
-    # Calculate scores for final output
-    final_sources = []
-    for chunk in relevant_chunks[:5]:
-        source_item = chunk.copy()
-        # Ensure score is present for UI
-        if "score" not in source_item:
-             if "distance" in chunk and chunk["distance"] is not None:
-                 source_item["score"] = 1 - chunk["distance"]
-             else:
-                 source_item["score"] = 0.9999 # Max for exact keyword match
-        final_sources.append(source_item)
-
     try:
-        print(f"DEBUG: Starting generation...")
+        if status == "low_context":
+            # REVISED REQUIREMENT: "provide low context info" if out of context
+            print(f"DEBUG: Generating general answer (Low Context)...")
+            formatted_prompt = prompt_general.format(question=query)
+        else:
+            print(f"DEBUG: Generating context-based answer...")
+            # Use top 5 chunks for more context
+            context_text = "\n\n".join([c["text"] for c in relevant_chunks[:5]])
+            formatted_prompt = prompt_context.format(context=context_text, question=query)
+
         g_start = time.time()
-        formatted_prompt = prompt.format(context=context_text, question=query)
         response = llm.invoke(formatted_prompt)
         answer = response.content.strip()
         print(f"DEBUG: Generation took {time.time() - g_start:.2f}s")
         
-        # Guardrail check
-        if "I don't have enough information" in answer:
-             status = "low_context"
+        # Guardrail check for context-based answer
+        if status == "success" and "I don't have enough information" in answer:
+             status = "low_context_fallback"
+
+        # Calculate sources for final output
+        final_sources = []
+        for chunk in relevant_chunks[:5]:
+            source_item = chunk.copy()
+            # Ensure title is extracted from metadata for UI
+            if "title" not in source_item and "metadata" in chunk:
+                source_item["title"] = chunk["metadata"].get("title", "Unknown Source")
+            
+            # Ensure score is present for UI
+            if "score" not in source_item:
+                 if "distance" in chunk and chunk["distance"] is not None:
+                     source_item["score"] = 1 - chunk["distance"]
+                 elif "rrf_score" in chunk:
+                     source_item["score"] = chunk["rrf_score"]
+                 else:
+                     source_item["score"] = 0.8
+            final_sources.append(source_item)
 
         latency = time.time() - start_time
         metrics.log_request(status, latency, top_score)
