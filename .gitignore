@@ -5,7 +5,7 @@ backend/__pycache__/
 backend/*.db
 backend/*.sqlite3
 backend/data/chroma_db/
-backend/data/*.pdf
+# backend/data/*.pdf
 backend/.env
 
 # Frontend
