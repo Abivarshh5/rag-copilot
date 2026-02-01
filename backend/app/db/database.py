@@ -12,17 +12,23 @@ logger = logging.getLogger(__name__)
 # Check if running on Hugging Face Spaces
 IS_HF_SPACE = os.getenv("SPACE_ID") is not None
 
+# Check if running on Hugging Face Spaces
+IS_HF_SPACE = os.getenv("SPACE_ID") is not None
+
 if IS_HF_SPACE:
-    # Use persistent storage on HF
-    # We copy the deployed app.db to /handler/user/data if it doesn't exist there yet?
-    # Actually, the repo ignores changes to /app during runtime? No.
-    # On HF, the repo is at /home/user/app. Persistance is at /home/user/data.
-    # To keep the credentials we just pushed, we should mistakenly NOT use /data initially?
-    # But then we can't write new users.
-    # Correct strategy: On startup (init_db), copy ./app.db to /home/user/data/app.db if not exists.
-    # But for DATABASE_URL, we point to /home/user/data/app.db
-    DB_FILE = "/home/user/data/app.db"
+    # Hugging Face Persistent Storage is typically mounted at /data
+    # We check if /data exists and is writable
+    if os.path.exists("/data"):
+        DB_DIR = "/data"
+    else:
+        # Fallback to local app directory (ephemeral) if /data not found
+        # This prevents crash but data won't persist
+        DB_DIR = os.path.join(os.getcwd(), "data")
+        os.makedirs(DB_DIR, exist_ok=True)
+    
+    DB_FILE = os.path.join(DB_DIR, "app.db")
     DATABASE_URL = f"sqlite:///{DB_FILE}"
+    logger.info(f"Using Production DB Path: {DATABASE_URL}")
 else:
     # Local development
     DATABASE_URL = "sqlite:///./app.db"

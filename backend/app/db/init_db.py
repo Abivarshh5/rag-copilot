@@ -12,17 +12,24 @@ def init_db():
         if not os.path.exists(DB_FILE):
             logger.info(f"First run on HF detected. Copying seeded app.db to {DB_FILE}...")
             # Source file (in the deployed repo)
-            # Assuming working dir is /home/user/app, app.db should be in root
             SOURCE_DB = "app.db" 
             if os.path.exists(SOURCE_DB):
                 try:
+                    # Ensure destination directory exists (if we fell back to local 'data' folder)
+                    os.makedirs(os.path.dirname(DB_FILE), exist_ok=True)
+                    
                     shutil.copy(SOURCE_DB, DB_FILE)
-                    logger.info("Database copied successfully.")
+                    
+                    # IMPORTANT: Set permissions to read/write for the user
+                    # In some docker containers, copied files might inherit restricted permissions
+                    os.chmod(DB_FILE, 0o666) # Read/Write for everyone (safe inside container)
+                    
+                    logger.info("Database copied successfully and permissions set.")
                 except Exception as e:
                     logger.error(f"Failed to copy database: {e}")
             else:
                 logger.warning(f"Source database {SOURCE_DB} not found! Starting with empty DB.")
         else:
-            logger.info("Persistent database found.")
+            logger.info(f"Persistent database found at {DB_FILE}.")
 
     Base.metadata.create_all(bind=engine)
