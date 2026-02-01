@@ -20,7 +20,7 @@ const LoginPage = () => {
         try {
             const response = await apiClient.post('/auth/login', {
                 email: email.trim(),
-                password
+                password: password.trim() // Trim password to avoid copy-paste spaces
             });
             login(response.data.access_token);
             navigate('/app');

@@ -92,10 +92,12 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = get_user_by_email(db, data.email)
 
     if not user:
-        raise HTTPException(status_code=400, detail="Invalid credentials")
+        # DEBUG: distinct error
+        raise HTTPException(status_code=400, detail="User not found")
 
     if not verify_password(data.password, user.password_hash):
-        raise HTTPException(status_code=400, detail="Invalid credentials")
+        # DEBUG: distinct error
+        raise HTTPException(status_code=400, detail="Incorrect password")
 
     # Optimization: Re-hash if using old slow rounds
     from app.core.security import needs_rehash, hash_password
