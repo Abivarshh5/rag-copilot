@@ -6,29 +6,32 @@ from urllib.parse import quote_plus
 
 logger = logging.getLogger(__name__)
 
-# Supabase PostgreSQL connection
-# Password is URL-encoded to handle special characters like @
-SUPABASE_PASSWORD = quote_plus("Varshini@512")
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    f"postgresql+psycopg2://postgres.tljppxeshzeyjrupxpcc:{SUPABASE_PASSWORD}@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres"
-)
+# SQLite Configuration for Single-Link Deployment
+# We prioritize the local app.db which contains the user's credentials.
 
-logger.info(f"Connecting to database...")
+# Check if running on Hugging Face Spaces
+IS_HF_SPACE = os.getenv("SPACE_ID") is not None
+
+if IS_HF_SPACE:
+    # Use persistent storage on HF
+    # We copy the deployed app.db to /handler/user/data if it doesn't exist there yet?
+    # Actually, the repo ignores changes to /app during runtime? No.
+    # On HF, the repo is at /home/user/app. Persistance is at /home/user/data.
+    # To keep the credentials we just pushed, we should mistakenly NOT use /data initially?
+    # But then we can't write new users.
+    # Correct strategy: On startup (init_db), copy ./app.db to /home/user/data/app.db if not exists.
+    # But for DATABASE_URL, we point to /home/user/data/app.db
+    DB_FILE = "/home/user/data/app.db"
+    DATABASE_URL = f"sqlite:///{DB_FILE}"
+else:
+    # Local development
+    DATABASE_URL = "sqlite:///./app.db"
+
+logger.info(f"Connecting to database: {DATABASE_URL}")
 
 engine = create_engine(
     DATABASE_URL, 
-    pool_pre_ping=True,
-    # Supabase Transaction Mode Pooler requirements:
-    # 1. Disable prepared statements (prepare_threshold=None)
-    # 2. Add keepalives to prevent timeouts
-    connect_args={
-        "prepare_threshold": None,
-        "keepalives": 1, 
-        "keepalives_idle": 30,
-        "keepalives_interval": 10, 
-        "keepalives_count": 5
-    }
+    connect_args={"check_same_thread": False} # Needed for SQLite
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
