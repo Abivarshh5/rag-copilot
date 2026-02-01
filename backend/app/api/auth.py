@@ -97,6 +97,16 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     if not verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=400, detail="Invalid credentials")
 
+    # Optimization: Re-hash if using old slow rounds
+    from app.core.security import needs_rehash, hash_password
+    if needs_rehash(user.password_hash):
+        try:
+            print(f"DEBUG: optimizing hash for {data.email}")
+            user.password_hash = hash_password(data.password)
+            db.commit()
+        except Exception as e:
+            print(f"WARN: Failed to rehash password: {e}")
+
     token = create_access_token({"user_id": user.id})
 
     return {
