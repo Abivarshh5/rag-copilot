@@ -37,3 +37,13 @@ def debug_count():
     from app.rag.engine import get_collection
     col = get_collection()
     return {"count": col.count()}
+
+@router.get("/debug_path")
+def debug_path():
+    import os
+    return {
+        "cwd": os.getcwd(),
+        "ls_root": os.listdir("."),
+        "exists_data": os.path.exists("data"),
+        "exists_backend_data": os.path.exists("backend/data")
+    }
