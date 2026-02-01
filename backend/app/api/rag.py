@@ -39,11 +39,15 @@ def debug_count():
     col = get_collection()
     return {"count": col.count()}
 
+import time
+BUILD_TIME = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+
 @router.get("/debug_path")
 def debug_path():
     import os
     from app.rag.engine import DATA_DIR, DOCS_DIR
     res = {
+        "build_time": BUILD_TIME,
         "cwd": os.getcwd(),
         "DATA_DIR": DATA_DIR,
         "DOCS_DIR": DOCS_DIR,
