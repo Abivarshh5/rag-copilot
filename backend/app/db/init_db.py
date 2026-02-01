@@ -33,3 +33,16 @@ def init_db():
             logger.info(f"Persistent database found at {DB_FILE}.")
 
     Base.metadata.create_all(bind=engine)
+    
+    # Verify DB content
+    try:
+        from sqlalchemy.orm import Session
+        session = Session(bind=engine)
+        user_count = session.query(models.User).count()
+        logger.info(f"DB CONFIG CHECK: Found {user_count} users in database.")
+        if user_count > 0:
+            first_user = session.query(models.User).first()
+            logger.info(f"DB CONFIG CHECK: First user email: {first_user.email}")
+        session.close()
+    except Exception as e:
+        logger.error(f"DB CONFIG CHECK FAILED: {e}")
