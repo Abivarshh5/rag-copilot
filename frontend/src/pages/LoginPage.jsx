@@ -25,7 +25,9 @@ const LoginPage = () => {
             login(response.data.access_token);
             navigate('/app');
         } catch (err) {
-            setError(err.response?.data?.detail || 'Invalid email or password');
+            console.error(err);
+            const msg = err.response?.data?.detail || err.message || 'Login failed';
+            setError(`Error: ${msg} (Status: ${err.response?.status})`);
         } finally {
             setLoading(false);
         }

@@ -119,3 +119,27 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 def get_me(current_user: User = Depends(get_current_user)):
     """Protected endpoint - returns current user info."""
     return current_user
+
+# 9. DEBUG endpoint
+@router.get("/debug_login")
+def debug_login(email: str, password: str, db: Session = Depends(get_db)):
+    """DEBUG ONLY: Test login logic via GET request."""
+    user = get_user_by_email(db, email)
+    if not user:
+        return {"status": "fail", "reason": "User not found in DB"}
+    
+    # Check hash
+    is_valid = verify_password(password, user.password_hash)
+    
+    # Check rehash
+    from app.core.security import needs_rehash
+    rehash_needed = needs_rehash(user.password_hash)
+    
+    return {
+        "status": "success" if is_valid else "fail",
+        "reason": "Valid credentials" if is_valid else "Password mismatch",
+        "user_email": user.email,
+        "hash_prefix": user.password_hash[:10] + "...",
+        "rehash_needed": rehash_needed,
+        "password_provided": password
+    }
