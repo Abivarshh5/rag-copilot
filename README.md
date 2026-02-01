@@ -74,12 +74,15 @@ make test
 
 ## Live Deployment
 
-### 🚀 Production App (Single Link)
+### 🚀 Production App
 - **Live URL**: [https://huggingface.co/spaces/abiramavarshini/rag-backend](https://huggingface.co/spaces/abiramavarshini/rag-backend)
 - **Direct App Link**: [https://abiramavarshini-rag-backend.hf.space](https://abiramavarshini-rag-backend.hf.space)
 - **Status**: Running 🟢
 
-The entire application (Frontend + Backend + RAG) is hosted here. Anyone with this link can sign up, log in, and use the RAG copilot immediately.
+### Anyone with the link can:
+1. **Sign up** or **Log in** (No email verification required for demo).
+2. **Chat** with the AI about the 38 pre-trained documents.
+3. **Verify Sources**: Every answer includes the source PDF name and confidence score.
 
 ## API Documentation
 
@@ -97,6 +100,6 @@ The entire application (Frontend + Backend + RAG) is hosted here. Anyone with th
   ```
 
 ## Ingestion & Evaluation
-- **Ingestion**: PDFs in `backend/data/` are read, split into 150-word chunks with 30-word overlap, and indexed.
-- **Evaluation**: We use a hybrid retrieval approach (Vector + Keyword) and verify answers by checking if retrieval scores exceed a 0.60 threshold.
-
+- **Ingestion**: PDFs in `backend/data/` are read, split into **300-word chunks** with 50-word overlap for deep context.
+- **Evaluation**: Hybrid retrieval (Vector + BM25) with **Reciprocal Rank Fusion (RRF)** ensures high precision. 
+- **Out-of-Context Handling**: The LLM provides helpful general knowledge if documents don't have the answer, but marks it clearly as such.
