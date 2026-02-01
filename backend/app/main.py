@@ -80,10 +80,6 @@ def startup_event():
 app.include_router(auth.router)
 app.include_router(rag.router)
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
-
 @app.get("/debug_db")
 def debug_db():
     try:
