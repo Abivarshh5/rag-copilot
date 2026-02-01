@@ -17,12 +17,12 @@ const SourceList = ({ sources }) => {
                             <span style={{
                                 background: 'var(--primary)',
                                 color: 'white',
-                                padding: '0.125rem 0.5rem',
+                                padding: '0.125rem 0.6rem',
                                 borderRadius: '9999px',
                                 fontSize: '0.75rem',
                                 fontWeight: '600'
                             }}>
-                                Score: {source.score.toFixed(4)}
+                                Match: {(source.score * 100).toFixed(0)}%
                             </span>
                             {source.metadata?.url && (
                                 <a href={source.metadata.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-muted)' }}>
@@ -30,11 +30,22 @@ const SourceList = ({ sources }) => {
                                 </a>
                             )}
                         </div>
-                        <div style={{ fontWeight: '500', color: 'var(--text-main)', marginBottom: '0.25rem' }}>
-                            {source.metadata?.title || source.id || 'Unknown Source'}
+                        <div style={{ fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <FileText size={16} />
+                            {source.metadata?.title || source.id?.split('_')[0] || 'Unknown Document'}
                         </div>
-                        <div style={{ color: 'var(--text-muted)', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                            {source.text}
+                        <div style={{ 
+                            color: 'var(--text-muted)', 
+                            background: 'rgba(0,0,0,0.03)', 
+                            padding: '0.5rem', 
+                            borderRadius: '0.5rem',
+                            fontStyle: 'italic',
+                            display: '-webkit-box', 
+                            WebkitLineClamp: '3', 
+                            WebkitBoxOrient: 'vertical', 
+                            overflow: 'hidden' 
+                        }}>
+                            "{source.text}"
                         </div>
                     </div>
                 ))}

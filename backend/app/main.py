@@ -3,6 +3,8 @@ import time
 import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.db.init_db import init_db
 from app.api import auth, rag
 from app.rag.engine import init_bm25, DATA_DIR, DOCS_DIR, DB_PATH
@@ -13,15 +15,11 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# CORS Middleware - permit all origins for now to resolve Vercel deployment issues
+# CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "*",
-        "https://rag-copilot.vercel.app",
-        "http://localhost:5173"
-    ],
-    allow_credentials=False, # Must be False if using ["*"] or combined with wildcard
+    allow_origins=["*"], # Allow all for simplicity in production verification/mixed hosting
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -56,13 +54,9 @@ def startup_event():
     except Exception as e:
         logger.error(f"Failed during startup: {e}")
 
-@app.get("/")
-def read_root():
-    return {
-        "message": "RAG Copilot Backend is running!",
-        "docs": "/docs",
-        "health": "/health"
-    }
+# --- API ROUTES (Define these FIRST) ---
+app.include_router(auth.router)
+app.include_router(rag.router)
 
 @app.get("/health")
 def health():
@@ -121,5 +115,18 @@ def debug_db():
             "traceback": traceback.format_exc()
         }
 
-app.include_router(auth.router)
-app.include_router(rag.router)
+# --- STATIC FILES & FRONTEND (Define these LAST) ---
+
+# Mount assets first (CSS, JS) so they aren't caught by the catch-all
+app.mount("/assets", StaticFiles(directory="app/static/assets"), name="assets")
+
+# Serve index.html for root and client-side routing
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    # Check if file exists in static (e.g. vite.svg, robots.txt)
+    static_file_path = os.path.join("app/static", full_path)
+    if os.path.exists(static_file_path) and os.path.isfile(static_file_path):
+        return FileResponse(static_file_path)
+    
+    # Otherwise return index.html for React Router to handle
+    return FileResponse("app/static/index.html")

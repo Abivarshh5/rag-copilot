@@ -90,7 +90,7 @@ def generate_answer(query: str):
     
     # 2. CONFIDENCE CHECK (GUARDRAILS)
     # Lowered threshold for better coverage of PDF content
-    REVISED_THRESHOLD = 0.60
+    REVISED_THRESHOLD = 0.40
     REVISED_MIN_CHUNKS = 1
     
     relevant_chunks = []

@@ -3,10 +3,10 @@
 *.sqlite3
 
 # chroma
-data/chroma_db/
+# data/chroma_db/
 
 # documents
-*.pdf
+# *.pdf
 
 # env
 .env
