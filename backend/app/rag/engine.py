@@ -73,9 +73,11 @@ def init_bm25():
 def load_docs() -> List[Dict]:
     """Loads both JSON and PDF documents from their respective directories."""
     docs = []
+    print(f"DEBUG: load_docs searching in DATA_DIR={DATA_DIR}")
     
     # 1. Load JSONs from data/docs
     if os.path.exists(DOCS_DIR):
+        print(f"DEBUG: Found DOCS_DIR={DOCS_DIR}")
         for filename in os.listdir(DOCS_DIR):
             if filename.endswith(".json"):
                 path = os.path.join(DOCS_DIR, filename)
@@ -83,19 +85,28 @@ def load_docs() -> List[Dict]:
                     try:
                         data = json.load(f)
                         docs.append(data)
+                        print(f"DEBUG: Loaded JSON: {filename}")
                     except Exception as e:
-                        print(f"Error loading {filename}: {e}")
+                        print(f"ERROR: Failed to load JSON {filename}: {e}")
+    else:
+        print(f"DEBUG: DOCS_DIR NOT FOUND: {DOCS_DIR}")
     
     # 2. Load PDFs from data/
     if os.path.exists(DATA_DIR):
-        for filename in os.listdir(DATA_DIR):
+        print(f"DEBUG: Searching for PDFs in {DATA_DIR}")
+        all_files = os.listdir(DATA_DIR)
+        print(f"DEBUG: Files in DATA_DIR: {all_files}")
+        for filename in all_files:
             if filename.lower().endswith(".pdf"):
                 path = os.path.join(DATA_DIR, filename)
                 try:
+                    print(f"DEBUG: Attempting to read PDF: {filename} (Size: {os.path.getsize(path)} bytes)")
                     reader = PdfReader(path)
                     text = ""
-                    for page in reader.pages:
-                        text += page.extract_text() + "\n"
+                    for i, page in enumerate(reader.pages):
+                        extracted = page.extract_text()
+                        if extracted:
+                            text += extracted + "\n"
                     
                     if text.strip():
                         docs.append({
@@ -103,9 +114,13 @@ def load_docs() -> List[Dict]:
                             "title": filename,
                             "body": text
                         })
-                        print(f"Loaded PDF: {filename}")
+                        print(f"DEBUG: Successfully loaded PDF: {filename} ({len(text)} chars)")
+                    else:
+                        print(f"DEBUG: PDF {filename} is EMPTY or NO TEXT EXTRACTED.")
                 except Exception as e:
-                    print(f"Error loading PDF {filename}: {e}")
+                    print(f"ERROR: Failed to load PDF {filename}: {e}")
+    else:
+        print(f"DEBUG: DATA_DIR NOT FOUND: {DATA_DIR}")
                     
     return docs
 

@@ -10,6 +10,7 @@ class RetrieveRequest(BaseModel):
 
 @router.post("/ingest")
 def ingest_endpoint():
+    # We could capture stdout here but for now let's just use the stats
     stats = ingest_docs()
     return {"status": "success", "stats": stats}
 
