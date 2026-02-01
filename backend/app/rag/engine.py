@@ -126,6 +126,8 @@ def ingest_docs():
     all_ids = []
     all_metadatas = []
     
+    files_processed = []
+    errors = []
     doc_count = 0
     chunk_count = 0
     
@@ -144,24 +146,33 @@ def ingest_docs():
             
         doc_count += 1
         chunk_count += len(chunks)
+        files_processed.append(title)
 
     if all_chunks:
-        # Generate embeddings with normalization for better cosine similarity
-        m = get_model()
-        embeddings = m.encode(all_chunks, normalize_embeddings=True).tolist()
+        try:
+            # Generate embeddings with normalization for better cosine similarity
+            m = get_model()
+            embeddings = m.encode(all_chunks, normalize_embeddings=True).tolist()
+            
+            # Add to Chroma (upsert overwrites if ID exists)
+            col = get_collection()
+            col.upsert(
+                documents=all_chunks,
+                embeddings=embeddings,
+                metadatas=all_metadatas,
+                ids=all_ids
+            )
+            # Refresh BM25
+            init_bm25()
+        except Exception as e:
+            errors.append(f"Chroma/Embedding Error: {str(e)}")
         
-        # Add to Chroma (upsert overwrites if ID exists)
-        col = get_collection()
-        col.upsert(
-            documents=all_chunks,
-            embeddings=embeddings,
-            metadatas=all_metadatas,
-            ids=all_ids
-        )
-        # Refresh BM25
-        init_bm25()
-        
-    return {"doc_count": doc_count, "chunk_count": chunk_count}
+    return {
+        "doc_count": doc_count, 
+        "chunk_count": chunk_count,
+        "files_processed": files_processed,
+        "errors": errors
+    }
 
 def retrieve_docs(query: str, k: int = 3):
     # Embed query with normalization
