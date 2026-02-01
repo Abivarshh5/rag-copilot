@@ -74,15 +74,12 @@ make test
 
 ## Live Deployment
 
-### 🟢 Backend (Hugging Face Spaces)
-- **Live URL**: [https://abiramavarshini-rag-backend.hf.space](https://abiramavarshini-rag-backend.hf.space)
-- **Status**: Running 🚀
+### 🚀 Production App (Single Link)
+- **Live URL**: [https://huggingface.co/spaces/abiramavarshini/rag-backend](https://huggingface.co/spaces/abiramavarshini/rag-backend)
+- **Direct App Link**: [https://abiramavarshini-rag-backend.hf.space](https://abiramavarshini-rag-backend.hf.space)
+- **Status**: Running 🟢
 
-### 🔵 Frontend (Vercel)
-- **Live URL**: [https://rag-copilot.vercel.app/](https://rag-copilot.vercel.app/)
-- **Status**: Running 🚀
-
-Anyone with this link can sign up, log in, and use the RAG copilot without any local setup.
+The entire application (Frontend + Backend + RAG) is hosted here. Anyone with this link can sign up, log in, and use the RAG copilot immediately.
 
 ## API Documentation
 
