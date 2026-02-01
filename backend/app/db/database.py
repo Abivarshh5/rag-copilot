@@ -16,19 +16,19 @@ IS_HF_SPACE = os.getenv("SPACE_ID") is not None
 IS_HF_SPACE = os.getenv("SPACE_ID") is not None
 
 if IS_HF_SPACE:
-    # Hugging Face Persistent Storage is typically mounted at /data
-    # We check if /data exists and is writable
-    if os.path.exists("/data"):
-        DB_DIR = "/data"
-    else:
-        # Fallback to local app directory (ephemeral) if /data not found
-        # This prevents crash but data won't persist
-        DB_DIR = os.path.join(os.getcwd(), "data")
-        os.makedirs(DB_DIR, exist_ok=True)
+    # User does NOT have persistent storage enabled (/data).
+    # We must use a local writable directory inside the container.
+    # standard HF working dir is /home/user/app.
+    # We can write to a subdirectory like /home/user/app/data or just ./data
+    # BUT we need to make sure we copy the seeded db there.
+    
+    # Force use of local directory
+    DB_DIR = os.path.join(os.getcwd(), "data")
+    os.makedirs(DB_DIR, exist_ok=True)
     
     DB_FILE = os.path.join(DB_DIR, "app.db")
     DATABASE_URL = f"sqlite:///{DB_FILE}"
-    logger.info(f"Using Production DB Path: {DATABASE_URL}")
+    logger.info(f"Using Ephemeral DB Path: {DATABASE_URL}")
 else:
     # Local development
     DATABASE_URL = "sqlite:///./app.db"
