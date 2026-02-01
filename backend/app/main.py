@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# CORS Middleware
+# --- MIDDLEWARE ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], # Allow all for simplicity in production verification/mixed hosting
@@ -23,6 +23,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "message": "Backend is running"}
 
 # Logging Middleware
 @app.middleware("http")

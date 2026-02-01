@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    // Default to relative path '/' for production (single-link deployment)
-    baseURL: import.meta.env.VITE_API_URL || '/',
+    // HARDCODED for Production: Always use relative path
+    baseURL: '/',
 });
 
 apiClient.interceptors.request.use((config) => {
