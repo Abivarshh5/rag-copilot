@@ -33,32 +33,15 @@ def init_db():
 
     Base.metadata.create_all(bind=engine)
     
-    # Verify DB content and FORCE RESET password for test user
+    # Verify DB content
     try:
         from sqlalchemy.orm import Session
-        from app.core.security import hash_password
-        
         session = Session(bind=engine)
         user_count = session.query(models.User).count()
         logger.info(f"DB CONFIG CHECK: Found {user_count} users in database.")
-        
-        # Emergency Fix: Force reset test@example.com
-        test_user = session.query(models.User).filter(models.User.email == "test@example.com").first()
-        if test_user:
-            logger.info("EMERGENCY FIX: Resetting password for test@example.com to 'password'")
-            test_user.password_hash = hash_password("password")
-            session.commit()
-            logger.info("Password reset successful.")
-        else:
-            logger.warning("test@example.com not found. Creating it...")
-            new_user = models.User(
-                email="test@example.com",
-                password_hash=hash_password("password")
-            )
-            session.add(new_user)
-            session.commit()
-            logger.info("Created fallback user: test@example.com / password")
-            
+        if user_count > 0:
+            first_user = session.query(models.User).first()
+            logger.info(f"DB CONFIG CHECK: First user email: {first_user.email}")
         session.close()
     except Exception as e:
         logger.error(f"DB CONFIG CHECK FAILED: {e}")
